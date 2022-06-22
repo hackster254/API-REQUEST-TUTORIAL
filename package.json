@@ -4,6 +4,7 @@
     "nodemon": "^2.0.16"
   },
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "sqlwithNode": "nodemon studentApiDB.js"
   }
 }
