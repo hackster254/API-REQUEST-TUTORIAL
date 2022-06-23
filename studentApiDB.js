@@ -175,3 +175,59 @@ app.put('/api/students/:id', function(req,res){
     })
 
 })
+
+// delete student details
+app.delete('/api/students/:id', function(req,res){
+    let id = +req.params.id
+
+    let connection = getConnection()
+
+
+    let sql = "DELETE from students WHERE id=?"
+
+    
+    connection.query(sql, id, function(err,result){
+        if(err){
+            res.status(404).send('error in deleting student data')
+            console.log(err)
+        } else if (result.affectedRows ===0){
+            res.status(404).send('error: No record was deleted')
+
+        } else {
+            res.status(200).send("student deleted successfully ")
+
+        }
+         
+    })
+})
+
+// route to truncate table and then insert the records again
+// we are gonna use data from data.js file
+app.get('/api/resetData', function(req,res){
+    // we  will truncate the table so that auto increment is not
+    let connection = getConnection()
+    //let sql = "DELETE from students"
+     let sql = "TRUNCATE table students"
+
+    connection.query(sql, function(err,result){
+        if(err){
+            res.status(404).send('error urghh')
+        } else {
+            console.log(`successfully deleted students table contents for ${result.affectedRows}`)
+
+            let {studentData} = require('./data.js')
+            // convert json to array
+            let arrStudent = studentData.map(st => [st.name, st.course, st.grade, st.city])
+
+            let sql2 = "INSERT into students(name,course,grade,city) VALUES ?"
+
+            connection.query(sql2, [arrStudent], function(err,result){
+                if(err){
+                    res.status(404).send('error in inserting data after reset')
+                }else {
+                    res.status(200).send(`reset success. Inserted ${result.affectedRows}`)
+                }
+            })
+        }
+    })
+})
